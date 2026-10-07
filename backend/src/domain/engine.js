@@ -74,6 +74,8 @@ function handle(state, event, now) {
     case 'RECOVER': {
       // Boot time recovery logic
       state.mode = Mode.RECOVERING;
+      state.stage = Stage.ALL_RED;
+      state.phase = null;
       state.desiredSignals = deriveSignals(Stage.ALL_RED, null, state.config);
       const cmdEffect = issue(state, state.desiredSignals, now);
       effects.push(cmdEffect);
