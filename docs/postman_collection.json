@@ -1,0 +1,122 @@
+{
+  "info": {
+    "name": "Factory Traffic Management API",
+    "description": "API collection for managing traffic junctions",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Junctions",
+      "item": [
+        {
+          "name": "List Junctions",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/junctions",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "junctions"]
+            }
+          }
+        },
+        {
+          "name": "Get Junction State",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/junctions/A/state",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "junctions", "A", "state"]
+            }
+          }
+        },
+        {
+          "name": "Get Junction History",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/junctions/A/history",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "junctions", "A", "history"]
+            }
+          }
+        },
+        {
+          "name": "Submit Sensor Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": \"evt_001\",\n  \"direction\": \"NORTH\",\n  \"vehicleId\": \"veh_001\",\n  \"vehicleType\": \"TRUCK\",\n  \"type\": \"VEHICLE_ARRIVED\",\n  \"sequenceNo\": 1,\n  \"timestamp\": 1672531200000\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/junctions/A/sensor-events",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "junctions", "A", "sensor-events"]
+            }
+          }
+        },
+        {
+          "name": "Request Manual Control",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"adminId\": \"admin_1\",\n  \"direction\": \"EAST\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/junctions/A/manual",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "junctions", "A", "manual"]
+            }
+          }
+        },
+        {
+          "name": "Return to Automatic",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"adminId\": \"admin_1\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/junctions/A/automatic",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "junctions", "A", "automatic"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

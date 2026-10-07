@@ -1,0 +1,196 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Factory Traffic Management API",
+    "version": "1.0.0",
+    "description": "API for managing industrial factory traffic junctions."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Local development server"
+    }
+  ],
+  "paths": {
+    "/junctions": {
+      "get": {
+        "summary": "List all configured junctions",
+        "responses": {
+          "200": {
+            "description": "A list of junctions"
+          }
+        }
+      }
+    },
+    "/junctions/{id}/state": {
+      "get": {
+        "summary": "Get the current state of a junction",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The current state"
+          },
+          "404": {
+            "description": "Junction not found"
+          }
+        }
+      }
+    },
+    "/junctions/{id}/history": {
+      "get": {
+        "summary": "Get recent audit logs for a junction",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of audit logs"
+          }
+        }
+      }
+    },
+    "/junctions/{id}/stream": {
+      "get": {
+        "summary": "SSE stream of live state updates",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SSE Event Stream"
+          }
+        }
+      }
+    },
+    "/junctions/{id}/sensor-events": {
+      "post": {
+        "summary": "Submit a vehicle arrival or clearance event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["eventId", "direction", "vehicleId", "type", "sequenceNo", "timestamp"],
+                "properties": {
+                  "eventId": { "type": "string" },
+                  "direction": { "type": "string", "enum": ["NORTH", "SOUTH", "EAST", "WEST"] },
+                  "vehicleId": { "type": "string" },
+                  "vehicleType": { "type": "string", "enum": ["EMERGENCY", "TRUCK", "FORKLIFT", "EMPLOYEE"] },
+                  "type": { "type": "string", "enum": ["VEHICLE_ARRIVED", "VEHICLE_CLEARED"] },
+                  "sequenceNo": { "type": "integer" },
+                  "timestamp": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Event accepted" },
+          "200": { "description": "Duplicate event" },
+          "400": { "description": "Invalid event" },
+          "422": { "description": "Validation error" }
+        }
+      }
+    },
+    "/junctions/{id}/manual": {
+      "post": {
+        "summary": "Take manual control of a junction",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["adminId", "direction"],
+                "properties": {
+                  "adminId": { "type": "string" },
+                  "direction": { "type": "string", "enum": ["NORTH", "SOUTH", "EAST", "WEST"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": { "description": "Manual control acquired" },
+          "409": { "description": "Conflict or degraded state" }
+        }
+      }
+    },
+    "/junctions/{id}/automatic": {
+      "post": {
+        "summary": "Return junction to automatic control",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["adminId"],
+                "properties": {
+                  "adminId": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Returned to automatic control" }
+        }
+      }
+    }
+  }
+}
