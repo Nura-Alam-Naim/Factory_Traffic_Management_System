@@ -9,12 +9,14 @@ class JunctionActor {
    * @param {Object} repo - RepositoryPort
    * @param {Object} network - NetworkPort { sendCommand(junctionId, command) }
    * @param {Object} clock - { now() }
+   * @param {Object} statusBus - Emit state updates
    */
-  constructor(junctionId, repo, network, clock) {
+  constructor(junctionId, repo, network, clock, statusBus) {
     this.junctionId = junctionId;
     this.repo = repo;
     this.network = network;
     this.clock = clock;
+    this.statusBus = statusBus;
     
     // The mailbox queue to serialize operations
     this.queue = Promise.resolve();
@@ -114,6 +116,10 @@ class JunctionActor {
         commands: newCommands
       });
 
+      if (this.statusBus) {
+        this.statusBus.broadcast(this.junctionId, result.state);
+      }
+
       // 5. Network Side-Effects
       for (const effect of result.effects) {
         if (effect.type === 'SEND_COMMAND') {
@@ -162,6 +168,10 @@ class JunctionActor {
         auditEntries,
         commands: newCommands
       });
+
+      if (this.statusBus) {
+        this.statusBus.broadcast(this.junctionId, result.state);
+      }
 
       for (const effect of result.effects) {
         if (effect.type === 'SEND_COMMAND') {

@@ -44,7 +44,7 @@ describe('API Routes', () => {
       .post('/api/junctions/A/manual')
       .send({ adminId: 'admin1', direction: 'NORTH' });
       
-    expect(res.statusCode).toBe(200);
+    expect(res.statusCode).toBe(202);
     expect(actors.get('A').dispatch).toHaveBeenCalledWith(expect.objectContaining({
       type: 'MANUAL_GREEN_REQUEST',
       adminId: 'admin1',
