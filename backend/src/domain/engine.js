@@ -1,6 +1,6 @@
 'use strict';
 
-const { Mode, Stage, DeviceStatus } = require('./models');
+const { Mode, Stage, DeviceStatus, Signal } = require('./models');
 const { startYellow, startAllRed, startGreen, isStageComplete } = require('./state_machine');
 const { choosePhase } = require('./scheduler');
 const { addVehicle, clearVehicle, expireGhosts } = require('./queues');
@@ -45,6 +45,16 @@ function handle(state, event, now) {
       const res = onAck(state, event, now);
       if (res.effects) effects.push(...res.effects);
       outcome = { status: res.outcome };
+      
+      // Exit RECOVERING mode if we successfully reached ALL_RED
+      if (state.mode === Mode.RECOVERING && !res.mismatch && !state.pendingCommand) {
+        const allRed = Object.values(state.actualSignals).every(s => s === Signal.RED);
+        if (allRed) {
+          state.mode = Mode.AUTOMATIC; // Temporary so resolveMode doesn't stick
+          state.mode = modes.resolveMode(state, now);
+          effects.push(audit('MODE_CHANGED', 'Recovery complete'));
+        }
+      }
       break;
     }
 
