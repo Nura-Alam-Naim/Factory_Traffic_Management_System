@@ -43,8 +43,10 @@ A mission-critical backend service for managing traffic junctions inside a busy 
 - `GET /api/junctions` - List all configured junctions
 - `GET /api/junctions/:id/state` - Get the current state of a junction
 - `GET /api/junctions/:id/history` - Get recent audit logs
+- `GET /api/junctions/:id/stream` - SSE stream of live state updates
 - `POST /api/junctions/:id/manual` - Take manual control `{"adminId": "123", "direction": "NORTH"}`
 - `POST /api/junctions/:id/automatic` - Return to automatic `{"adminId": "123"}`
+- `POST /api/junctions/:id/sensor-events` - Submit a vehicle arrival/clearance
 
 ## MQTT Topics
 
