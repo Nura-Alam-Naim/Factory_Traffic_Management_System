@@ -51,7 +51,7 @@ describe('Normal Cycle', () => {
     expect(isStageComplete(state, clock.now())).toBe(true);
 
     // 3. Start ALL_RED
-    effects = startAllRed(state, 'EW', clock.now(), 'Yellow done');
+    startAllRed(state, 'EW', clock.now(), 'Yellow done');
     expect(state.stage).toBe(Stage.ALL_RED);
     expect(state.nextPhase).toBe('EW');
     expect(state.desiredSignals.NORTH).toBe(Signal.RED);
@@ -71,7 +71,7 @@ describe('Normal Cycle', () => {
     expect(isStageComplete(state, clock.now())).toBe(true);
 
     // 4. Start GREEN for EW
-    effects = startGreen(state, 'EW', clock.now(), 'All red done');
+    startGreen(state, 'EW', clock.now(), 'All red done');
     expect(state.stage).toBe(Stage.GREEN);
     expect(state.phase).toBe('EW');
     expect(state.desiredSignals.EAST).toBe(Signal.GREEN);
