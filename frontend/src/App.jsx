@@ -1,122 +1,74 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import React from 'react';
+import { useJunctionStatus } from './hooks/useJunctionStatus';
+import { IntersectionView } from './components/IntersectionView';
+import { SimulationPanel } from './components/SimulationPanel';
+import './index.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const junctionId = 'A'; // Hardcoded for this assessment demo
+  const { state, history, connected, error } = useJunctionStatus(junctionId);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="app-container">
+      <header className="app-header glassmorphism">
+        <h1>Factory Traffic Monitor</h1>
+        <div className="status-indicators">
+          <span className={`connection-badge ${connected ? 'online' : 'offline'}`}>
+            {connected ? '● Live SSE' : '○ Disconnected'}
+          </span>
+          <span className="junction-badge">Junction {junctionId}</span>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      </header>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+      {error && (
+        <div className="alert-banner error">
+          ⚠️ Connection Error: {error}
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      {state && state.mode === 'DEGRADED' && (
+        <div className="alert-banner warning pulse">
+          ⚠️ DEGRADED MODE: Controller is Offline or Unresponsive. Failsafe ALL RED engaged.
+        </div>
+      )}
+
+      {state && state.mode === 'EMERGENCY' && (
+        <div className="alert-banner danger pulse-fast">
+          🚨 EMERGENCY PREEMPTION ACTIVE 🚨
+        </div>
+      )}
+
+      {state && state.mode === 'MANUAL' && (
+        <div className="alert-banner info">
+          ✋ MANUAL OVERRIDE ACTIVE (Admin: {state.manualLease?.adminId})
+        </div>
+      )}
+
+      <main className="main-content">
+        <section className="viz-section">
+          <IntersectionView state={state} />
+        </section>
+
+        <aside className="control-section">
+          <SimulationPanel junctionId={junctionId} />
+          
+          <div className="panel data-panel glassmorphism mt-4">
+            <h3>Live Data</h3>
+            <pre className="code-block">
+              {state ? JSON.stringify({
+                mode: state.mode,
+                stage: state.stage,
+                phase: state.phase,
+                queues: Object.fromEntries(
+                  Object.entries(state.queues).map(([k, v]) => [k, Object.keys(v).length])
+                )
+              }, null, 2) : 'Loading...'}
+            </pre>
+          </div>
+        </aside>
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
