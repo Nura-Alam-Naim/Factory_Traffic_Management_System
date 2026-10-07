@@ -1,8 +1,7 @@
 #!/bin/bash
 API="http://localhost:3000/api/junctions/A"
-
 echo "=================================================="
-echo "Scenario 8: Crash Recovery"
+echo "Scenario 8: Restart Recovery"
 echo "=================================================="
 
 echo "To demonstrate this, manually restart the backend process."
