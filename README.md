@@ -1,56 +1,55 @@
 # Factory Traffic Management System
 
-> Backend Developer Intern assessment. Node.js · Express · MySQL · MQTT · React.
+A mission-critical backend service for managing traffic junctions inside a busy industrial factory.
 
-## Overview
+## Stack
+- Node.js
+- Express (REST API)
+- MySQL2 (Persistence)
+- Aedes (Embedded MQTT broker)
+- Jest (Testing)
 
-_TODO (Phase 6)._
+## Quick Start
 
-## Setup & Run
+1. **Start the Database**
+   ```bash
+   docker-compose up -d
+   ```
 
-_TODO (Phase 6)._
+2. **Install Dependencies**
+   ```bash
+   cd backend
+   npm install
+   ```
 
-## Architecture Decisions
+3. **Run Tests**
+   ```bash
+   npm run test
+   ```
 
-_TODO (Phase 6). See [MEGAPLAN.md](./MEGAPLAN.md) Section 2 for the planned architecture._
+4. **Start the Server**
+   ```bash
+   npm start
+   ```
 
-## Traffic-Control Algorithm
+## Documentation
 
-_TODO (Phase 6)._
+- [Architecture & Design Decisions](./ARCHITECTURE.md)
+- [Execution Megaplan](./MEGAPLAN.md)
+- [Agent Rules](./AGENTS.md)
 
-## State Transitions
+## API Endpoints
 
-_TODO (Phase 6)._
+- `GET /api/junctions` - List all configured junctions
+- `GET /api/junctions/:id/state` - Get the current state of a junction
+- `GET /api/junctions/:id/history` - Get recent audit logs
+- `POST /api/junctions/:id/manual` - Take manual control `{"adminId": "123", "direction": "NORTH"}`
+- `POST /api/junctions/:id/automatic` - Return to automatic `{"adminId": "123"}`
 
-## Assumptions / Questions / Requirement Issues
+## MQTT Topics
 
-_TODO (Phase 6)._
-
-## API Docs
-
-_TODO (Phase 4/6)._
-
-### API changes
-
-_None yet._
-
-## Demo Scenarios
-
-_TODO (Phase 6)._
-
-## Tests
-
-```bash
-cd backend
-npm test             # full suite
-npm run test:domain  # pure domain tests only
-npm run lint         # includes domain-purity rules
-```
-
-## Incomplete / Next Steps
-
-_TODO (Phase 6)._
-
-## AI / Tool Usage
-
-_TODO (Phase 6)._
+- Listen: `factory/traffic/<junction_id>/sensor`
+- Listen: `factory/traffic/<junction_id>/controller/ack`
+- Listen: `factory/traffic/<junction_id>/controller/status`
+- Publish: `factory/traffic/<junction_id>/command`
+- Publish: `factory/traffic/<junction_id>/alerts`
