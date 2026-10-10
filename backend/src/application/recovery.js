@@ -7,14 +7,25 @@ async function recoverJunctions({ repo, clock }) {
   const junctions = await repo.loadJunctions();
   const effectsToDispatch = [];
 
-  for (const { id } of junctions) {
-    const stateRecord = await repo.loadState(id);
-    if (!stateRecord) continue;
+  for (const { id, config } of junctions) {
+    let stateRecord = await repo.loadState(id);
+    let isNew = false;
+    
+    if (!stateRecord) {
+      const { createJunctionState } = require('../domain/initial_state');
+      stateRecord = {
+        state: createJunctionState(id, config, clock.now()),
+        version: 0
+      };
+      isNew = true;
+    }
 
     const { state, version } = stateRecord;
 
     // 1. Mark pending commands as abandoned
-    await repo.markPendingCommandsAbandoned(id);
+    if (!isNew) {
+      await repo.markPendingCommandsAbandoned(id);
+    }
 
     const prevStateLog = {
       mode: state.mode,
@@ -42,7 +53,7 @@ async function recoverJunctions({ repo, clock }) {
     }
 
     const auditEntries = [
-      { eventType: 'RECOVERY_STARTED', reason: 'Boot', details: prevStateLog },
+      { eventType: isNew ? 'INITIALIZED' : 'RECOVERY_STARTED', reason: 'Boot', details: prevStateLog },
       ...result.effects.filter(e => e.type === 'AUDIT').map(e => ({
         eventType: e.eventType, reason: e.reason, details: e.details
       }))
