@@ -1,13 +1,14 @@
 'use strict';
 
-const aedes = require('aedes')();
+const { Aedes } = require('aedes');
 const net = require('net');
 const mqtt = require('mqtt');
 
 class MqttAdapter {
   constructor(port = 1883) {
     this.port = port;
-    this.server = net.createServer(aedes.handle);
+    this.aedes = null;
+    this.server = null;
     this.client = null;
     this.actors = new Map();
   }
@@ -17,12 +18,25 @@ class MqttAdapter {
   }
 
   async start() {
-    return new Promise((resolve) => {
+    this.aedes = new Aedes();
+    await this.aedes.listen();
+    this.server = net.createServer(this.aedes.handle);
+
+    return new Promise((resolve, reject) => {
+      console.log('MQTT server starting listen on port', this.port);
+      this.server.on('error', (err) => {
+        console.error('MQTT server listen error', err);
+        reject(err);
+      });
       this.server.listen(this.port, () => {
+        console.log('MQTT server listening');
         // Connect a client to our own broker to subscribe and publish
         this.client = mqtt.connect(`mqtt://127.0.0.1:${this.port}`);
         
+        this.client.on('error', (err) => console.error('MQTT client error', err));
+        
         this.client.on('connect', () => {
+          console.log('MQTT client connected');
           this.client.subscribe('factory/traffic/+/sensor');
           this.client.subscribe('factory/traffic/+/controller/ack');
           this.client.subscribe('factory/traffic/+/controller/status');
@@ -37,7 +51,21 @@ class MqttAdapter {
   async stop() {
     return new Promise((resolve) => {
       if (this.client) this.client.end();
-      this.server.close(() => resolve());
+      if (this.server) {
+        this.server.close(() => {
+          if (this.aedes) {
+            this.aedes.close(() => resolve());
+          } else {
+            resolve();
+          }
+        });
+      } else {
+        if (this.aedes) {
+          this.aedes.close(() => resolve());
+        } else {
+          resolve();
+        }
+      }
     });
   }
 

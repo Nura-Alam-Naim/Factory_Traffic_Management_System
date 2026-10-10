@@ -11,36 +11,36 @@ function App() {
   return (
     <div className="app-container">
       <header className="app-header glassmorphism">
-        <h1>Factory Traffic Monitor</h1>
+        <h1>Intelligent Traffic Manager</h1>
         <div className="status-indicators">
-          <span className={`connection-badge ${connected ? 'online' : 'offline'}`}>
-            {connected ? '● Live SSE' : '○ Disconnected'}
-          </span>
           <span className="junction-badge">Junction {junctionId}</span>
+          <span className={`connection-badge ${connected ? 'online' : 'offline'}`}>
+            {connected ? '● LIVE SYNC' : '○ DISCONNECTED'}
+          </span>
         </div>
       </header>
 
       {error && (
-        <div className="alert-banner error">
-          ⚠️ Connection Error: {error}
+        <div className="alert-banner danger">
+          <span>⚠️</span> Connection Error: {error}
         </div>
       )}
 
       {state && state.mode === 'DEGRADED' && (
         <div className="alert-banner warning pulse">
-          ⚠️ DEGRADED MODE: Controller is Offline or Unresponsive. Failsafe ALL RED engaged.
+          <span>⚠️</span> <strong>DEGRADED MODE:</strong> Controller is Offline. Failsafe ALL RED engaged.
         </div>
       )}
 
       {state && state.mode === 'EMERGENCY' && (
         <div className="alert-banner danger pulse-fast">
-          🚨 EMERGENCY PREEMPTION ACTIVE 🚨
+          <span>🚨</span> <strong>EMERGENCY PREEMPTION ACTIVE</strong>
         </div>
       )}
 
       {state && state.mode === 'MANUAL' && (
         <div className="alert-banner info">
-          ✋ MANUAL OVERRIDE ACTIVE (Admin: {state.manualLease?.adminId})
+          <span>✋</span> <strong>MANUAL OVERRIDE ACTIVE</strong> (Admin: {state.manualLease?.adminId})
         </div>
       )}
 
@@ -52,8 +52,8 @@ function App() {
         <aside className="control-section">
           <SimulationPanel junctionId={junctionId} />
           
-          <div className="panel data-panel glassmorphism mt-4">
-            <h3>Live Data</h3>
+          <div className="panel glassmorphism mt-4">
+            <h3>System Telemetry</h3>
             <pre className="code-block">
               {state ? JSON.stringify({
                 mode: state.mode,
@@ -62,7 +62,7 @@ function App() {
                 queues: Object.fromEntries(
                   Object.entries(state.queues).map(([k, v]) => [k, Object.keys(v).length])
                 )
-              }, null, 2) : 'Loading...'}
+              }, null, 2) : 'Awaiting telemetry...'}
             </pre>
           </div>
         </aside>

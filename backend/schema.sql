@@ -82,3 +82,10 @@ CREATE TABLE IF NOT EXISTS rejected_events (
   message TEXT,
   received_at BIGINT NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Insert default Demo Junction A so the application works out of the box
+INSERT IGNORE INTO junctions (id, name, config) VALUES (
+  'A', 
+  'Main Factory Intersection', 
+  '{"stages": [{"id":"NS_GREEN","directions":["NORTH","SOUTH"]}, {"id":"EW_GREEN","directions":["EAST","WEST"]}], "maxWaitTimeMs":30000, "yellowDurationMs": 3000}'
+);

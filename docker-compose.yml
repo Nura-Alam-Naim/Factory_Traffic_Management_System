@@ -1,13 +1,45 @@
-# OPTIONAL convenience: MySQL only. The backend creates the database and tables itself.
+version: '3.8'
+
 services:
-  mysql:
+  db:
     image: mysql:8.0
+    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: N@im2002
       MYSQL_DATABASE: factory_traffic
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - db_data:/var/lib/mysql
+
+  backend:
+    build: 
+      context: ./backend
+    restart: always
+    ports:
+      - "3000:3000"
+      - "1883:1883"
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=N@im2002
+      - DB_NAME=factory_traffic
+      - MQTT_PORT=1883
+      - PORT=3000
+      - START_SIMULATOR=true
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
 volumes:
-  mysql_data:
+  db_data:

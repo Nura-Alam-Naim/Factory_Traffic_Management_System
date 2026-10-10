@@ -1,4 +1,4 @@
-'use strict';
+'use strict'; // force restart
 
 const express = require('express');
 const cors = require('cors');
@@ -30,31 +30,39 @@ class Application {
   }
 
   async start() {
+    console.log('Starting app...');
     await initDb(this.config.db);
+    console.log('DB initialized');
     await this.mqtt.start();
+    console.log('MQTT started');
 
     // Setup actors
     const clock = { now: () => Date.now() };
     const junctions = await this.repo.loadJunctions();
+    console.log('Junctions loaded:', junctions.length);
     for (const j of junctions) {
       const actor = new JunctionActor(j.id, this.repo, this.mqtt, clock, this.statusBus);
       this.actors.set(j.id, actor);
 
       // Start simulator for each junction if enabled
       if (this.config.simulator && this.config.simulator.enabled) {
+        console.log('Starting simulator for', j.id);
         const sim = new ControllerSimulator(`mqtt://127.0.0.1:${this.config.mqttPort}`, j.id, this.config.simulator);
         this.simulators.push(sim);
         await sim.start();
+        console.log('Simulator started for', j.id);
       }
     }
     
     this.mqtt.setActors(this.actors);
 
     // Recover
+    console.log('Recovering...');
     const commandsToDispatch = await recoverJunctions({ repo: this.repo, clock });
     for (const { junctionId, command } of commandsToDispatch) {
       await this.mqtt.sendCommand(junctionId, command);
     }
+    console.log('Recovery done');
 
     // Start tick loop
     this.tickInterval = setInterval(() => {

@@ -2,14 +2,14 @@
   "name": "factory-traffic-backend",
   "version": "0.1.0",
   "description": "Factory Traffic Management System - backend (Express, MySQL, MQTT)",
-  "main": "src/index.js",
+  "main": "src/server.js",
   "private": true,
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "node --watch src/index.js",
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
     "test": "jest",
     "test:domain": "jest tests/domain",
     "lint": "eslint ."

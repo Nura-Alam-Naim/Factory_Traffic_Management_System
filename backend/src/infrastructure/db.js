@@ -31,7 +31,7 @@ async function initDb(config) {
   });
 
   // Apply schema
-  const schemaPath = path.join(__dirname, '../../../schema.sql');
+  const schemaPath = path.join(__dirname, '../../schema.sql');
   const schemaSql = fs.readFileSync(schemaPath, 'utf8');
   
   // Poor man's schema runner: split by ; and run
