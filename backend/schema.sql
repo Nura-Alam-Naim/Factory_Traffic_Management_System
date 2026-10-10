@@ -87,5 +87,5 @@ CREATE TABLE IF NOT EXISTS rejected_events (
 INSERT IGNORE INTO junctions (id, name, config) VALUES (
   'A', 
   'Main Factory Intersection', 
-  '{"stages": [{"id":"NS_GREEN","directions":["NORTH","SOUTH"]}, {"id":"EW_GREEN","directions":["EAST","WEST"]}], "maxWaitTimeMs":30000, "yellowDurationMs": 3000}'
+  '{"phases":{"NS":["NORTH","SOUTH"],"EW":["EAST","WEST"]},"conflicts":{"NS":["EW"],"EW":["NS"]},"timings":{"greenTargetMs":30000,"yellowMs":5000,"allRedMs":2000,"minGreenMs":10000,"maxGreenMs":60000},"scoring":{"weights":{"EMERGENCY":100,"TRUCK":5,"FORKLIFT":3,"EMPLOYEE":1},"waitFactor":0.1,"hysteresis":1.2,"maxWaitMs":90000,"starvationBonus":1000},"controller":{"ackTimeoutMs":5000,"maxRetries":2},"policies":{"manualLeaseMs":300000,"emergencyTimeoutMs":120000,"staleEventMaxAgeMs":300000,"queueEntryTtlMs":900000}}'
 );
